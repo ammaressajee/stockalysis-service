@@ -1,0 +1,4 @@
+# nixpacks.toml
+
+[start]
+cmd = "waitress-serve app.wsgi:app"
