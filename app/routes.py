@@ -11,13 +11,13 @@ import yfinance as yf
 routes = Blueprint("routes", __name__)
 
 @routes.route('/contact', methods=['GET'])
-@cross_origin(origins=["http://localhost:4200", "https://ecib-web-app-ui.s3.us-east-2.amazonaws.com"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:4200", "https://d1qfccnfz6gou3.cloudfront.net"], supports_credentials=True)
 def get_contacts():
     contacts = Contact.query.all()
     return jsonify([contact.to_dict() for contact in contacts])
 
 @routes.route('/contact', methods=['POST'])
-@cross_origin(origins=["http://localhost:4200", "https://ecib-web-app-ui.s3.us-east-2.amazonaws.com"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:4200", "https://d1qfccnfz6gou3.cloudfront.net"], supports_credentials=True)
 def create_contact():
     data = request.json
     new_contact = Contact(fname=data["fname"], lname=data["lname"], email=data["email"], message=data["message"], contact_number=data["contact_number"])
@@ -28,7 +28,7 @@ def create_contact():
     return jsonify({"message": "Contact saved successfully!"}), 201
 
 @routes.route('/analyze', methods=['GET'])
-@cross_origin(origins=["http://localhost:4200", "https://ecib-web-app-ui.s3.us-east-2.amazonaws.com"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:4200", "https://d1qfccnfz6gou3.cloudfront.net"], supports_credentials=True)
 def analyze_stock():
     ticker = request.args.get('ticker', '').upper()
 
@@ -146,7 +146,7 @@ def analyze_stock():
         return jsonify({"error": str(e)}), 500
     
 @routes.route('/predict', methods=['GET'])
-@cross_origin(origins=["http://localhost:4200", "https://ecib-web-app-ui.s3.us-east-2.amazonaws.com"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:4200", "https://d1qfccnfz6gou3.cloudfront.net"], supports_credentials=True)
 def predict_price():
     # Extract query parameters
     ticker = request.args.get('ticker')
