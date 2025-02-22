@@ -2,8 +2,42 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from tvDatafeed import TvDatafeed, Interval
 
-def fetch_stock_data(ticker):
+def fetch_colombo_stock_data(ticker):
+    # Initialize TradingView datafeed (no login required for public data)
+    tv = TvDatafeed()
+
+    # Fetch the last 40 days of historical data from CSE
+    df = tv.get_hist(symbol=ticker, exchange="CSELK", interval=Interval.in_daily, n_bars=500)
+
+    if df is None or df.empty:
+        print(f"No data found for {ticker}. Check if the symbol is correct.")
+        return None
+
+    # Rename columns to match yfinance format
+    df.rename(columns={
+        "open": "Open",
+        "high": "High",
+        "low": "Low",
+        "close": "Close",
+        "volume": "Volume"
+    }, inplace=True)
+
+    # Convert index to datetime (TradingView returns it as DateTimeIndex already)
+    df.index = pd.to_datetime(df.index)
+
+    # Ensure numerical columns are in float format
+    df = df.astype({"Open": float, "High": float, "Low": float, "Close": float, "Volume": float})
+
+    # Add missing columns to match yfinance (set as NaN or 0)
+    df["Dividends"] = 0.0
+    df["Stock Splits"] = 0.0
+
+    print(df.head())  # Preview the formatted data
+    return df
+
+def fetch_us_stock_data(ticker):
     """Fetches historical stock data for the given ticker."""
     stock = yf.Ticker(ticker)
     df = stock.history(period="2y")  # Get last 2 years of data

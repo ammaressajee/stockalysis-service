@@ -4,8 +4,6 @@ from flask_cors import cross_origin
 from app import db
 from app.models import Contact
 from flask import Flask, request, jsonify
-import yfinance as yf
-
 
 
 routes = Blueprint("routes", __name__)
@@ -31,12 +29,16 @@ def create_contact():
 @cross_origin(origins=["http://localhost:4200", "https://d1qfccnfz6gou3.cloudfront.net"], supports_credentials=True)
 def analyze_stock():
     ticker = request.args.get('ticker', '').upper()
+    exchange = request.args.get('exchange', '').upper()
 
     if not ticker:
         return jsonify({"error": "Ticker symbol is required"}), 400
 
     try:
-        df = fetch_stock_data(ticker)
+        if exchange == 'CSE':
+            df = fetch_colombo_stock_data(ticker)
+        elif exchange == 'US': 
+            df = fetch_us_stock_data(ticker)
 
         # Compute indicators
         df['SMA50'] = calculate_sma(df, 50)
@@ -64,7 +66,6 @@ def analyze_stock():
         # Initialize logging messages
         log = []
         log.append(f"Stock: {ticker}")
-        log.append(f"Full Stock Name: {yf.Ticker(ticker).info.get('longName', 'N/A')}")
         log.append(f"Last Close Price: {last_close}")
         log.append(f"50-Day Simple Moving Average (SMA50): {sma50} - Used to gauge short-term trend direction.")
         log.append(f"200-Day Simple Moving Average (SMA200): {sma200} - Used for long-term trend analysis.")
@@ -124,7 +125,6 @@ def analyze_stock():
 
         return jsonify({
             "ticker": ticker,
-            "full_name": yf.Ticker(ticker).info.get('longName', 'N/A'), 
             "last_close_price": last_close,
             "SMA50": sma50,
             "SMA200": sma200,
