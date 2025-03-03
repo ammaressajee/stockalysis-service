@@ -10,6 +10,8 @@ migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
+    # Allow CORS for specific frontend origin
+    CORS(app, resources={r"/*": {"origins": "https://stockalysis-service-production.up.railway.app"}})
     app.config.from_object(Config)
 
     # Enable CORS (to allow communication with Angular frontend)
