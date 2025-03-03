@@ -1,7 +1,6 @@
 import yfinance as yf
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 from tvDatafeed import TvDatafeed, Interval
 
 def fetch_colombo_stock_data(ticker):
@@ -91,24 +90,3 @@ def analyze_volume(df):
     """Checks if the current trading volume is significantly higher than the 50-day average."""
     avg_volume = df['Volume'].rolling(window=50).mean()
     return df['Volume'].iloc[-1] > avg_volume.iloc[-1] * 1.5  # 50% above average volume
-
-def predict_stock_price(ticker, days_ahead):
-    """Predicts stock price using a simple linear regression model based on historical closing prices."""
-    df = fetch_stock_data(ticker)  # Fetch 2 years of stock data
-
-    # Prepare data for linear regression
-    df['Days'] = np.arange(len(df))  # Convert date index into numerical format
-    X = df[['Days']]  # Independent variable
-    y = df['Close']   # Dependent variable (price)
-
-    # Train linear regression model
-    model = LinearRegression()
-    model.fit(X, y)
-
-    # Predict future prices
-    future_days = np.array([[df['Days'].max() + i] for i in range(1, days_ahead + 1)])
-    predictions = model.predict(future_days)
-
-    # Return predictions as DataFrame
-    future_dates = pd.date_range(start=df.index[-1], periods=days_ahead + 1, freq='B')[1:]  # Business days only
-    return pd.DataFrame({'Date': future_dates, 'Predicted_Close': predictions})

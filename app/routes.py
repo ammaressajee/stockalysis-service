@@ -3,7 +3,7 @@ from flask import jsonify, request, Blueprint
 from flask_cors import cross_origin
 from app import db
 from app.models import Contact
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 
 
 routes = Blueprint("routes", __name__)
@@ -148,16 +148,5 @@ def analyze_stock():
 @routes.route('/predict', methods=['GET'])
 @cross_origin(origins=["http://localhost:4200", "https://d1qfccnfz6gou3.cloudfront.net"], supports_credentials=True)
 def predict_price():
-    # Extract query parameters
-    ticker = request.args.get('ticker')
-    days = request.args.get('days', type=int)
 
-    # Validate input
-    if not ticker or not days:
-        return jsonify({"error": "Missing required parameters 'ticker' or 'days'"}), 400
-
-    # Call your prediction function
-    predictions = predict_stock_price(ticker, days)
-
-    # Convert DataFrame to JSON response
-    return predictions.to_json(orient="records")
+    return None
